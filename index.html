@@ -14,99 +14,113 @@
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
-        
-        /* BASE BODY: Deep Black */
+
+        /* BASE BODY: Deep Black and Setup */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #050505; /* Deeper black */
             color: #E5E7EB; /* Light gray text */
             min-height: 100vh;
-            padding: 4px;
+            padding: 4rem 2rem; /* Adjusted padding for better fit */
+            overflow-x: hidden;
+            position: relative;
         }
 
-        /* 3D CANVAS STYLING: Fixed position behind content */
+        /* THREE.JS CANVAS SETUP */
         #three-container {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1; /* Below content, above background */
-            pointer-events: none; /* Allows interaction with content below */
-        }
-        
-        /* Set up 3D Perspective on the main grid container */
-        .content-grid {
-            perspective: 1500px; /* Crucial for 3D tilt effect */
+            z-index: 1; /* Below content but above background */
+            pointer-events: none; /* Allows clicks to pass through to content */
         }
 
-        /* CARD STYLING: Glassmorphism, 3D Transition, and Entry Animation */
+        /* CARD STYLING: Glassmorphism, Lift, and Entry Animation */
         .video-card {
             position: relative;
             z-index: 10;
-            background-color: rgba(16, 16, 16, 0.85); /* Semi-transparent for glass effect */
+            background-color: rgba(16, 16, 16, 0.85); /* Slightly transparent for glass effect */
             backdrop-filter: blur(8px); /* The core glass effect */
             border: 1px solid rgba(40, 40, 40, 0.7); /* Subtle border for definition */
-            transform-style: preserve-3d; /* Allows child elements (or the card itself) to be positioned in 3D */
-            padding: 1.5rem; /* Padding for the entire card */
-            
+            /* Crucial for 3D tilt */
+            transform-style: preserve-3d;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             /* Initial shadow */
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9);
-            
-            /* Smooth transition for all effects (tilt, shadow, lift) */
-            transition: all 0.1s linear; /* Fast transition for smooth cursor tracking */
-            
             /* Entry Animation (Starts hidden) */
-            opacity: 0; 
+            opacity: 0;
             animation: slideInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
 
         /* Staggered Delay for subsequent cards */
         main section:nth-child(2).video-card { animation-delay: 0.2s; }
-        
-        /* Accent Color: Bright Teal/Cyan */
+
+        /* New Accent Color for Hover */
         .accent-color {
-            color: #06B6D4; 
+            color: #06B6D4; /* Bright Teal/Cyan Accent */
         }
-        
+
         .video-card:hover {
-            /* Retain lift and add glow on hover */
-            /* The 3D tilt is handled by JS, this resets the base lift */
-            transform: translateY(-8px); 
-            /* Sharp Glowing Shadow Effect using the Cyan accent */
-            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.4), 0 0 15px rgba(6, 182, 212, 0.6); 
+            /* Deeper lift on hover */
+            transform: translateY(-8px);
+            /* Sharp Glowing Shadow Effect using the new Cyan accent */
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.4), 0 0 15px rgba(6, 182, 212, 0.6);
             border-color: #06B6D4; /* Accent border on hover */
         }
 
-        .video-player-container {
-            /* Adds a slight inner shadow for depth around the video */
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
-            position: relative; /* Needed for the overlay */
-            margin-bottom: 1.5rem; /* Space below the video container */
+        /* VIDEO OVERLAY CONTAINER */
+        .video-overlay-container {
+            position: relative;
+            /* Added aspect ratio for consistent sizing */
+            aspect-ratio: 16 / 9;
+            background-color: #000;
+            border-radius: 0.5rem;
+            overflow: hidden;
         }
 
-        /* OVERLAY STYLING for the text */
+        /* VIDEO PLAYER STYLING - Hidden until hover, then opacity 1 */
+        .video-player {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            opacity: 0; /* Initially hidden */
+            transition: opacity 0.6s ease-in-out; /* Smooth reveal */
+        }
+
+        /* TEXT OVERLAY (Covers video) */
         .card-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(16, 16, 16, 0.95); /* Nearly opaque dark background for text */
-            transition: opacity 0.6s ease-in-out; /* INCREASED for smoother fade */
-            /* Padding for overlay content, matched to the container padding */
-            padding: 1.5rem; 
-            box-sizing: border-box;
-            opacity: 1; /* Initially visible */
-            pointer-events: none; /* Allows mouse events to reach the card for JS tracking */
+            padding: 1.5rem;
+            background-color: rgba(16, 16, 16, 0.95); /* Nearly opaque dark background */
+            transition: opacity 0.6s ease-in-out; /* Smooth fade for visibility */
+            /* Ensure text is above video */
+            z-index: 20;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: center;
         }
 
-        /* Style for the GitHub button background on hover */
-        .hover\:bg-accent-cyan:hover {
-            background-color: #06B6D4;
+        /* Hide overlay and reveal video on card hover */
+        .video-overlay-container:hover .card-overlay {
+            opacity: 0;
+        }
+        .video-overlay-container:hover .video-player {
+            opacity: 1; /* Video revealed and plays */
+        }
+
+        /* Ensure content stays above the 3D background */
+        header, main, footer {
+            position: relative;
+            z-index: 10;
         }
     </style>
     <script>
@@ -114,9 +128,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary-dark': '#050505', 
-                        'secondary-dark': '#101010', 
-                        'accent-cyan': '#06B6D4', 
+                        'primary-dark': '#050505',
+                        'secondary-dark': '#101010',
+                        'accent-cyan': '#06B6D4', /* New Cyan Accent color */
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -125,265 +139,249 @@
             }
         }
 
-        // Simple JavaScript utility for messages
-        function showMessage(message) {
-            const messageBox = document.getElementById('message-box');
-            const messageText = document.getElementById('message-text');
-            messageBox.textContent = message;
-            messageBox.classList.remove('hidden');
-            setTimeout(() => {
-                messageBox.classList.add('hidden');
-            }, 3000);
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('video').forEach(video => {
-                video.onerror = function() {
-                    console.error("Video failed to load or is unreadable.");
-                };
-            });
-            setupThreeJs();
-            setupCardTilt(); // Initialize 3D card movement
-            setupVideoReveal(); // Initialize video hover/reveal logic
-        });
+            const cardContainers = document.querySelectorAll('.video-card-container');
 
-        // --- VIDEO REVEAL LOGIC ---
-        function setupVideoReveal() {
-            const cards = document.querySelectorAll('.video-card');
+            cardContainers.forEach(container => {
+                const card = container.querySelector('.video-card');
+                const video = container.querySelector('video');
 
-            cards.forEach(card => {
-                // The video and overlay are children of the video-player-container
-                const videoContainer = card.querySelector('.video-player-container');
-                const video = videoContainer.querySelector('video');
-                const overlay = videoContainer.querySelector('.card-overlay');
-
-                if (!video || !overlay) return;
-
-                card.addEventListener('mouseenter', () => {
-                    // Hide overlay
-                    overlay.style.opacity = '0';
-                    // Play video (Autoplay works because the video is now muted)
-                    video.play().catch(e => console.error("Error playing video:", e));
-                });
-
-                card.addEventListener('mouseleave', () => {
-                    // Show overlay
-                    overlay.style.opacity = '1';
-                    // Pause and rewind video
-                    video.pause();
-                    video.currentTime = 0; 
-                });
-            });
-        }
-
-
-        // --- 3D CARD TILT EFFECT ---
-        function setupCardTilt() {
-            const cards = document.querySelectorAll('.video-card');
-
-            cards.forEach(card => {
-                card.addEventListener('mousemove', (e) => {
+                // --- 3D TILT EFFECT ---
+                const tiltEffect = (e) => {
                     const rect = card.getBoundingClientRect();
                     const centerX = rect.left + rect.width / 2;
                     const centerY = rect.top + rect.height / 2;
 
-                    // Calculate mouse position relative to center (-1 to 1)
-                    const x = (e.clientX - centerX) / (rect.width / 2);
-                    const y = (e.clientY - centerY) / (rect.height / 2);
+                    // Calculate rotation based on mouse position
+                    const rotateX = (e.clientY - centerY) / 20; // Max 7 deg tilt
+                    const rotateY = (e.clientX - centerX) / 20;
 
-                    // Map to rotation angles (in degrees, inverse for natural tilt)
-                    const rotateY = x * 7; // Max 7 degrees tilt left/right
-                    const rotateX = y * -7; // Max 7 degrees tilt up/down
+                    // Apply transformation
+                    card.style.transform = `perspective(1000px) rotateX(${-rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+                };
 
-                    // Apply the rotation transform, maintaining the lift (translateY(-8px))
-                    card.style.transform = `translateY(-8px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-                });
+                const resetTilt = () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(-8px)';
+                };
 
-                card.addEventListener('mouseleave', () => {
-                    // Reset rotation when mouse leaves, keeping the lift (translateY(-8px))
-                    card.style.transform = 'translateY(-8px) rotateX(0deg) rotateY(0deg)';
-                });
+                card.addEventListener('mousemove', tiltEffect);
+                card.addEventListener('mouseleave', resetTilt);
+
+                // --- VIDEO PLAYBACK ON HOVER ---
+                const playVideo = () => {
+                    // Muted video can autoplay, bypassing user interaction error
+                    if (video) {
+                        video.play().catch(error => {
+                            console.error("Error playing video:", error);
+                        });
+                    }
+                };
+
+                const pauseVideo = () => {
+                    if (video) {
+                        video.pause();
+                        // Rewind to start for clean loop on next hover
+                        video.currentTime = 0;
+                    }
+                };
+
+                // The video-overlay-container handles the hover to trigger both CSS (fade) and JS (play/pause)
+                container.addEventListener('mouseenter', playVideo);
+                container.addEventListener('mouseleave', pauseVideo);
             });
-        }
+        });
 
 
-        // --- THREE.JS 3D ANIMATION SETUP ---
-        let scene, camera, renderer, cube, particles;
-
-        function setupThreeJs() {
+        // --- THREE.JS BACKGROUND ANIMATION LOGIC ---
+        window.onload = function() {
             const container = document.getElementById('three-container');
             if (!container) return;
 
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true }); // Alpha true for transparent background
-            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            container.appendChild(renderer.domElement);
-            
-            camera.position.z = 5;
+            const ACCENT_COLOR = 0x06B6D4;
+            let scene, camera, renderer;
+            let cube, particles;
+            let particleCount = 1000;
 
-            // 1. Wireframe Cube
-            const geometry = new THREE.BoxGeometry(2, 2, 2);
-            const material = new THREE.LineBasicMaterial({ 
-                color: 0x06B6D4, // Cyan Accent Color
-                linewidth: 2,
-                transparent: true,
-                opacity: 0.2 
-            });
-            
-            cube = new THREE.LineSegments(
-                new THREE.EdgesGeometry(geometry),
-                material
-            );
-            scene.add(cube);
+            function init() {
+                // Scene
+                scene = new THREE.Scene();
 
-            // 2. Particle Field
-            const particleCount = 500;
-            const particleGeometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(particleCount * 3);
-            const particleMaterial = new THREE.PointsMaterial({
-                color: 0x06B6D4, // Cyan Accent Color
-                size: 0.02,
-                sizeAttenuation: true,
-                transparent: true,
-                opacity: 0.8
-            });
+                // Camera
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.z = 5;
 
-            for (let i = 0; i < particleCount * 3; i += 3) {
-                positions[i] = (Math.random() - 0.5) * 10;
-                positions[i + 1] = (Math.random() - 0.5) * 10;
-                positions[i + 2] = (Math.random() - 0.5) * 10;
+                // Renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                container.appendChild(renderer.domElement);
+
+                // 1. Cube (Wireframe Structure)
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
+                const material = new THREE.MeshBasicMaterial({
+                    color: ACCENT_COLOR,
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                // 2. Particles (Data Flow)
+                const particleGeometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                for (let i = 0; i < particleCount * 3; i++) {
+                    positions[i] = (Math.random() - 0.5) * 10;
+                }
+                particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const particleMaterial = new THREE.PointsMaterial({
+                    color: ACCENT_COLOR,
+                    size: 0.02,
+                    blending: THREE.AdditiveBlending,
+                    transparent: true,
+                    opacity: 0.8
+                });
+                particles = new THREE.Points(particleGeometry, particleMaterial);
+                scene.add(particles);
+
+                // Lighting (Optional but good practice)
+                const ambientLight = new THREE.AmbientLight(0x404040);
+                scene.add(ambientLight);
+
+                window.addEventListener('resize', onWindowResize, false);
+                animate();
             }
 
-            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            particles = new THREE.Points(particleGeometry, particleMaterial);
-            scene.add(particles);
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
 
-            window.addEventListener('resize', onWindowResize, false);
-            animate();
-        }
+            function animate() {
+                requestAnimationFrame(animate);
 
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
+                // Subtle Rotation
+                cube.rotation.x += 0.0005;
+                cube.rotation.y += 0.0008;
 
-        function animate() {
-            requestAnimationFrame(animate);
+                // Subtle Particle Movement
+                particles.rotation.y -= 0.0003;
+                particles.rotation.x += 0.0002;
 
-            // Subtle, slow rotation for the cube and particles
-            cube.rotation.x += 0.0005;
-            cube.rotation.y += 0.001;
-            particles.rotation.x += 0.0001;
-            particles.rotation.y += 0.0003;
+                renderer.render(scene, camera);
+            }
 
-            renderer.render(scene, camera);
-        }
-        
-        window.onload = function () {
-            // Start the animation on window load.
-            setupThreeJs(); 
+            init();
         }
     </script>
 </head>
-<body class="text-gray-100 min-h-screen p-4 sm:p-8">
+<body class="text-gray-100 min-h-screen">
 
-    <!-- 3D Background Container -->
+    <!-- THREE.JS 3D Background Container -->
     <div id="three-container"></div>
-    
+
     <!-- Global Message Box (Instead of alert()) -->
-    <div id="message-box" class="hidden fixed top-5 left-1/2 transform -translate-x-1/2 bg-accent-cyan text-gray-900 px-6 py-3 rounded-lg shadow-xl z-50">
+    <div id="message-box" class="hidden fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl z-50">
         <span id="message-text"></span>
     </div>
 
     <!-- Header Section -->
-    <header class="text-center mb-12 relative z-20">
+    <header class="text-center mb-12 relative z-20 pt-16 sm:pt-20">
         <h1 class="text-5xl font-extrabold tracking-tight accent-color mb-2 sm:text-6xl text-shadow-lg">
             Project Showcase
         </h1>
-        <p class="text-lg text-gray-400">Deep Dives into **VisuWeave** and **EcoVista**</p>
+        <p class="text-lg text-gray-400">Deep Dives into VisuWeave and EcoVista</p>
     </header>
 
     <!-- Main Content Grid -->
-    <main class="max-w-6xl mx-auto grid grid-cols-1 gap-10 lg:grid-cols-2 content-grid">
+    <main class="max-w-6xl mx-auto grid grid-cols-1 gap-10 lg:grid-cols-2 pb-16">
 
-        <!-- PROJECT CARD 1: VisuWeave -->
-        <section class="video-card rounded-xl">
-             <!-- Card Content Container -->
-            <div class="flex flex-col h-full">
-                <!-- Video Player (Hidden by Overlay) -->
-                <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden border border-gray-700 video-player-container">
-                    <video controls preload="auto" class="w-full h-full object-cover" muted>
+        <!-- PROJECT CARD 1: VisuWeave (Wrapper for 3D effect) -->
+        <div class="video-card-container">
+            <section class="video-card p-6 rounded-xl">
+                <!-- Project Title & Tech Stack (Always visible) -->
+                <h2 class="text-3xl font-bold text-gray-200 mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 accent-color"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                    VisuWeave
+                </h2>
+                <p class="text-gray-500 mb-4 font-semibold text-sm">
+                    Python, ASR, NLP (BERT), GANs, RL
+                </p>
+
+                <!-- Video Player and Hover Overlay -->
+                <div class="video-overlay-container mb-6">
+                    <video controls preload="auto" class="video-player" muted>
+                        <!-- VisuWeave URL (Working): -->
                         <source src="https://raw.githubusercontent.com/UDAY2031/Project_demo/main/VisuWeave%20demo.mp4" type="video/mp4">
-                        <p class="text-center pt-8 text-gray-500">Video failed to load. Please verify the URL.</p>
+                        <p class="text-center pt-8 text-gray-500">
+                            Video failed to load.
+                        </p>
                     </video>
-                    
-                    <!-- Overlay that hides the video initially -->
-                    <div class="card-overlay">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-200 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 accent-color"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
-                                VisuWeave - Dynamic Presentation System
-                            </h2>
-                            <p class="text-gray-400 mb-6 font-semibold">
-                                Tech Stack: Python, Speech-to-Text (ASR), NLP (BERT), GANs, Reinforcement Learning
-                            </p>
-                            <p class="text-gray-300 mb-6">
-                                A real-time **Speech-to-Visual mapping system**. It utilizes **cloud-based ASR** for transcription and **NLP models (like BERT)** to extract critical phrases and context from live audio. This is followed by a pipeline leveraging **AI image generation (Stable Diffusion/DALL·E 2)** and web scraping, with the Piston Framework ensuring **visual coherence** and **minimal latency**. The system dynamically produces visuals and animated transitions in a GUI based on speech.
-                            </p>
-                            <p class="text-xs text-gray-500 mt-2">
-                                *Hover to play demo. Video is muted for instant playback.*
-                            </p>
-                        </div>
+
+                    <!-- Overlay Text Content (Fades out on hover) -->
+                    <div class="card-overlay rounded-lg">
+                        <h3 class="text-3xl font-bold text-gray-200 mb-4">Dynamic Presentation System</h3>
+                        <p class="text-gray-300 mb-4">
+                            A real-time Speech-to-Visual mapping system. It utilizes cloud-based ASR for transcription and NLP models (like BERT) to extract critical phrases and context from live audio. This is followed by a pipeline leveraging AI image generation and web scraping to dynamically produce visuals and animated transitions in a GUI, ensuring visual coherence and minimal latency.
+                        </p>
+                        <p class="text-gray-500 text-sm mt-2">
+                            *Move your cursor over this area to start the video demo (muted).*
+                        </p>
                     </div>
                 </div>
 
-                <!-- Actions - MOVED OUTSIDE OVERLAY -->
-                <a href="https://github.com/UDAY2031/Project_demo" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-700 hover:bg-accent-cyan hover:text-gray-900 text-gray-200 font-semibold rounded-lg transition duration-200">
-                    View VisuWeave Code on GitHub
-                </a>
-            </div>
-        </section>
+                <!-- Actions - Always visible -->
+                <div class="mt-4">
+                    <a href="https://github.com/UDAY2031/Project_demo" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-800 hover:bg-accent-cyan hover:text-gray-900 text-gray-200 font-semibold rounded-lg transition duration-200 shadow-md">
+                        View VisuWeave Code on GitHub
+                    </a>
+                </div>
+            </section>
+        </div>
 
-        <!-- PROJECT CARD 2: EcoVista -->
-        <section class="video-card rounded-xl">
-             <!-- Card Content Container -->
-            <div class="flex flex-col h-full">
-                <!-- Video Player (Hidden by Overlay) -->
-                <div class="aspect-video bg-gray-900 rounded-xl overflow-hidden border border-gray-700 video-player-container">
-                    <video controls preload="auto" class="w-full h-full object-cover" crossorigin="anonymous" muted>
+        <!-- PROJECT CARD 2: EcoVista (Wrapper for 3D effect) -->
+        <div class="video-card-container">
+            <section class="video-card p-6 rounded-xl">
+                <!-- Project Title & Tech Stack (Always visible) -->
+                <h2 class="text-3xl font-bold text-gray-200 mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 accent-color"><path d="M7 19H4.857a2 2 0 0 1-1.995-1.851L2.003 4.152A2 2 0 0 1 4.01 2h15.98a2 2 0 0 1 2.007 2.152l-1.85 13.997A2 2 0 0 1 19.143 19H17"/><path d="M12 5V2"/><path d="M10 7L12 5L14 7"/><path d="M9 14h6"/><path d="M12 14v4"/></svg>
+                    EcoVista
+                </h2>
+                <p class="text-gray-500 mb-4 font-semibold text-sm">
+                    Python, OpenCV, YOLOv8, IoT, CVAT
+                </p>
+
+                <!-- Video Player and Hover Overlay -->
+                <div class="video-overlay-container mb-6">
+                    <video controls preload="auto" class="video-player" muted>
+                        <!-- EcoVista URL (with fixes): -->
                         <source src="https://raw.githubusercontent.com/UDAY2031/Project_demo/main/EcoVista%20demo%202.mp4" type="video/mp4">
-                        <p class="text-center pt-8 text-gray-500">Video failed to load. Please verify the URL.</p>
+                        <p class="text-center pt-8 text-gray-500">
+                            Video failed to load.
+                        </p>
                     </video>
-                    
-                    <!-- Overlay that hides the video initially -->
-                    <div class="card-overlay">
-                        <div>
-                            <h2 class="text-3xl font-bold text-gray-200 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 accent-color"><path d="M7 19H4.857a2 2 0 0 1-1.995-1.851L2.003 4.152A2 2 0 0 1 4.01 2h15.98a2 2 0 0 1 2.007 2.152l-1.85 13.997A2 2 0 0 1 19.143 19H17"/><path d="M12 5V2"/><path d="M10 7L12 5L14 7"/><path d="M9 14h6"/><path d="M12 14v4"/></svg>
-                                EcoVista - AI-Driven Waste Segregation
-                            </h2>
-                            <p class="text-gray-400 mb-6 font-semibold">
-                                Tech Stack: Python, OpenCV, YOLOv8, IoT-enabled Hardware, CVAT
-                            </p>
-                            <p class="text-gray-300 mb-6">
-                                A comprehensive waste management solution with four modules: **YOLO v8-based Segregation** (dry, wet, recyclable, hazardous), **CVAT-enhanced Litter Detection**, a cost-effective **Hardware Prototype** using OpenCV for classification and sorting, and a **User/Admin Application**. The system includes an app-based reward system and surveillance monitoring with image matching to encourage proper disposal and maintain clean surroundings.
-                            </p>
-                            <p class="text-xs text-gray-500 mt-2">
-                                *Hover to play demo. Video is muted for instant playback.*
-                            </p>
-                        </div>
+
+                    <!-- Overlay Text Content (Fades out on hover) -->
+                    <div class="card-overlay rounded-lg">
+                        <h3 class="text-3xl font-bold text-gray-200 mb-4">AI-Driven Waste Segregation</h3>
+                        <p class="text-gray-300 mb-4">
+                            A comprehensive waste management solution with four modules: YOLO v8-based Segregation (dry, wet, recyclable, hazardous), CVAT-enhanced Litter Detection, a cost-effective Hardware Prototype using OpenCV for classification, and a User/Admin Application. The system includes an app-based reward system and surveillance monitoring to encourage proper disposal.
+                        </p>
+                         <p class="text-gray-500 text-sm mt-2">
+                            *Move your cursor over this area to start the video demo (muted).*
+                        </p>
                     </div>
                 </div>
 
-                <!-- Actions - MOVED OUTSIDE OVERLAY -->
-                <a href="https://github.com/UDAY2031/EcoVista" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-700 hover:bg-accent-cyan hover:text-gray-900 text-gray-200 font-semibold rounded-lg transition duration-200">
-                    View EcoVista Code on GitHub
-                </a>
-            </div>
-        </section>
+                <!-- Actions - Always visible -->
+                <div class="mt-4">
+                    <a href="https://github.com/UDAY2031/EcoVista" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-800 hover:bg-accent-cyan hover:text-gray-900 text-gray-200 font-semibold rounded-lg transition duration-200 shadow-md">
+                        View EcoVista Code on GitHub
+                    </a>
+                </div>
+            </section>
+        </div>
 
     </main>
 
