@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Demo Showcase</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- DYNAMIC ANIMATION KEYFRAMES --- */
+        @keyframes slideInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        /* New Keyframes for the Tech Mesh Background */
+        @keyframes meshGlow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 200%; } /* Slower, subtle pan */
+        }
+
+        /* BASE BODY: Deep Black and Panning Gradient */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #050505; /* Deeper black */
+            color: #E5E7EB; /* Light gray text */
+            min-height: 100vh;
+            p: 4;
+            /* Applying the animated, dynamic mesh pattern */
+            background-image: radial-gradient(#1a1a1a 1px, transparent 0), radial-gradient(#1a1a1a 1px, #050505 0);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            animation: meshGlow 60s linear infinite; /* Slow, continuous movement */
+        }
+
+        /* CARD STYLING: Lift, Shadow, and Entry Animation */
+        .video-card {
+            position: relative;
+            z-index: 10;
+            background-color: #101010; /* Very dark card color */
+            /* Initial shadow */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9);
+            /* Smooth transition for all effects */
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            /* Entry Animation (Starts hidden) */
+            opacity: 0; 
+            animation: slideInUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+        }
+
+        /* Staggered Delay for subsequent cards */
+        main section:nth-child(2).video-card { animation-delay: 0.2s; }
+
+        .video-card:hover {
+            transform: translateY(-8px); /* Deeper lift on hover */
+            /* Intense Glowing Shadow Effect - highlights the card beautifully */
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4), 0 0 15px rgba(99, 102, 241, 0.4); 
+            border-color: #6366F1; /* Accent border on hover */
+        }
+
+        .video-player-container {
+            /* Adds a slight inner shadow for depth around the video */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#050505', /* Ultra Deep Black Background */
+                        'secondary-dark': '#101010', /* Darker Gray Card Background */
+                        'accent-indigo': '#6366F1', /* Accent color */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        // Simple JavaScript to show a message instead of alert()
+        function showMessage(message) {
+            const messageBox = document.getElementById('message-box');
+            const messageText = document.getElementById('message-text');
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Placeholder interaction for copy button
+            document.querySelectorAll('.copy-link-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const link = e.currentTarget.getAttribute('data-link');
+                    // In a real application, you would use: navigator.clipboard.writeText(link)
+                    showMessage(`Link copied! (Simulated for: ${link})`);
+                });
+            });
+        });
+    </script>
+</head>
+<body class="text-gray-100 min-h-screen p-4 sm:p-8">
+
+    <!-- Global Message Box (Instead of alert()) -->
+    <div id="message-box" class="hidden fixed top-5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl z-50">
+        <span id="message-text"></span>
+    </div>
+
+    <!-- Header Section -->
+    <header class="text-center mb-12 relative z-20">
+        <h1 class="text-5xl font-extrabold tracking-tight text-accent-indigo mb-2 sm:text-6xl text-shadow-lg">
+            AI Project Showcase
+        </h1>
+        <p class="text-lg text-gray-400">Deep Dives into **VisuWeave** and **EcoVista**</p>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 gap-10 lg:grid-cols-2">
+
+        <!-- PROJECT CARD 1: VisuWeave -->
+        <section class="video-card bg-secondary-dark p-6 rounded-xl border border-gray-900">
+            <h2 class="text-3xl font-bold text-gray-200 mb-4 flex items-center">
+                <!-- Lucide 'Mic' Icon for Speech-to-Text -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-accent-indigo"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
+                VisuWeave - Dynamic Presentation System
+            </h2>
+            <p class="text-gray-400 mb-6 font-semibold">
+                Tech Stack: Python, Speech-to-Text (ASR), NLP, OpenCV, GANs, Reinforcement Learning
+            </p>
+            <p class="text-gray-400 mb-6">
+                Built an **AI system** using NLP and Reinforcement Learning to **extract presentation concepts** in real-time (latency < 2s). It developed a multi-source image pipeline with **GAN layouts** at ~25 FPS, enabling live, canvas-based presentations where visuals animate with speech.
+            </p>
+
+            <!-- Video Player (Replace source with your actual video link) -->
+            <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-700 video-player-container mb-6">
+                <video controls class="w-full h-full object-cover">
+                    <!-- ACTION: Replace the src with your video file path (e.g., demos/visuweave_demo.mp4) -->
+                    <source src="C:\Users\My PC\Downloads\Untitled video - Made with Clipchamp (2).mp4" type="video/mp4">
+                    <p class="text-center pt-8 text-gray-500">
+                        Video Placeholder (VisuWeave Demo) <br>
+                        <strong>Please update the video source attribute.</strong>
+                    </p>
+                </video>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="https://github.com/UDAY2031/VisuWeave.git" target="_blank" class="flex-1 text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
+                    View VisuWeave Code on GitHub
+                </a>
+                <button class="copy-link-btn flex-1 py-3 px-4 bg-accent-indigo hover:bg-indigo-700 text-white font-semibold rounded-lg transition duration-200" data-link="VISUWEAVE_DEMO_URL">
+                    Get Direct Link
+                </button>
+            </div>
+        </section>
+
+        <!-- PROJECT CARD 2: EcoVista -->
+        <section class="video-card bg-secondary-dark p-6 rounded-xl border border-gray-900">
+            <h2 class="text-3xl font-bold text-gray-200 mb-4 flex items-center">
+                <!-- Lucide 'Recycle' Icon for Waste Management -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 mr-3 text-accent-indigo"><path d="M7 19H4.857a2 2 0 0 1-1.995-1.851L2.003 4.152A2 2 0 0 1 4.01 2h15.98a2 2 0 0 1 2.007 2.152l-1.85 13.997A2 2 0 0 1 19.143 19H17"/><path d="M12 5V2"/><path d="M10 7L12 5L14 7"/><path d="M9 14h6"/><path d="M12 14v4"/></svg>
+                EcoVista - AI-Driven Waste Segregation
+            </h2>
+            <p class="text-gray-400 mb-6 font-semibold">
+                Tech Stack: Python, OpenCV, YOLOv8, IoT-enabled Hardware
+            </p>
+            <p class="text-gray-400 mb-6">
+                Engineered an **energy-efficient hardware prototype** using **YOLOv8** that achieved **92% accuracy** in waste segregation across 4 categories. The system implemented CVAT-based litter detection and included an app-based reward system, which reduced improper disposal by **35%** during pilot tests.
+            </p>
+
+            <!-- Video Player (Replace source with your actual video link) -->
+            <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-700 video-player-container mb-6">
+                <video controls class="w-full h-full object-cover">
+                    <!-- ACTION: Replace the src with your video file path (e.g., demos/ecovista_demo.mp4) -->
+                    <source src="U:\EcoVista demo 2.mp4" type="video/mp4">
+                    <p class="text-center pt-8 text-gray-500">
+                        Video Placeholder (EcoVista Demo) <br>
+                        <strong>Please update the video source attribute.</strong>
+                    </p>
+                </video>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="https://github.com/UDAY2031/EcoVista.git" target="_blank" class="flex-1 text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
+                    View EcoVista Code on GitHub
+                </a>
+                <button class="copy-link-btn flex-1 py-3 px-4 bg-accent-indigo hover:bg-indigo-700 text-white font-semibold rounded-lg transition duration-200" data-link="ECOVISTA_DEMO_URL">
+                    Get Direct Link
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-gray-500 border-t border-gray-900 pt-6 relative z-20">
+        <p>Prepared for Your Interview | &copy; 2025</p>
+        <p class="text-sm mt-1">Contact: uday242004@gmail.com</p>
+    </footer>
+
+</body>
+</html>
