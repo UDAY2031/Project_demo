@@ -12,21 +12,22 @@
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
         }
+        
         /* New Keyframes for the Tech Mesh Background */
         @keyframes meshGlow {
             0% { background-position: 0% 0%; }
             100% { background-position: 200% 200%; } /* Slower, subtle pan */
         }
 
-        /* BASE BODY: Deep Black and Panning Gradient */
+        /* BASE BODY: Deep Black and Bright Mesh Pattern */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #050505; /* Deeper black */
             color: #E5E7EB; /* Light gray text */
             min-height: 100vh;
             p: 4;
-            /* Applying the animated, dynamic mesh pattern */
-            background-image: radial-gradient(#1a1a1a 1px, transparent 0), radial-gradient(#1a1a1a 1px, #050505 0);
+            /* Applying the animated, dynamic mesh pattern: BRIGHTER DOTS */
+            background-image: radial-gradient(#444444 1px, transparent 0), radial-gradient(#444444 1px, #050505 0);
             background-size: 40px 40px;
             background-position: 0 0, 20px 20px;
             animation: meshGlow 60s linear infinite; /* Slow, continuous movement */
@@ -89,13 +90,12 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Placeholder interaction for copy button
-            document.querySelectorAll('.copy-link-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const link = e.currentTarget.getAttribute('data-link');
-                    // In a real application, you would use: navigator.clipboard.writeText(link)
-                    showMessage(`Link copied! (Simulated for: ${link})`);
-                });
+            // Fallback check for video loading
+            document.querySelectorAll('video').forEach(video => {
+                video.onerror = function() {
+                    console.error("Video failed to load or is unreadable. Check file path and MIME type.");
+                    // Optional: Display a user-friendly error message within the video area
+                };
             });
         });
     </script>
@@ -110,7 +110,7 @@
     <!-- Header Section -->
     <header class="text-center mb-12 relative z-20">
         <h1 class="text-5xl font-extrabold tracking-tight text-accent-indigo mb-2 sm:text-6xl text-shadow-lg">
-            AI Project Showcase
+            Project Showcase
         </h1>
         <p class="text-lg text-gray-400">Deep Dives into **VisuWeave** and **EcoVista**</p>
     </header>
@@ -126,32 +126,29 @@
                 VisuWeave - Dynamic Presentation System
             </h2>
             <p class="text-gray-400 mb-6 font-semibold">
-                Tech Stack: Python, Speech-to-Text (ASR), NLP, OpenCV, GANs, Reinforcement Learning
+                Tech Stack: Python, Speech-to-Text (ASR), NLP (BERT), GANs, Reinforcement Learning
             </p>
             <p class="text-gray-400 mb-6">
-                Built an **AI system** using NLP and Reinforcement Learning to **extract presentation concepts** in real-time (latency < 2s). It developed a multi-source image pipeline with **GAN layouts** at ~25 FPS, enabling live, canvas-based presentations where visuals animate with speech.
+                A real-time **Speech-to-Visual mapping system**. It utilizes **cloud-based ASR** for transcription and **NLP models (like BERT)** to extract critical phrases and context from live audio. This is followed by a pipeline leveraging **AI image generation (Stable Diffusion/DALL·E 2)** and web scraping, with the Piston Framework ensuring **visual coherence** and **minimal latency**. The system dynamically produces visuals and animated transitions in a GUI based on speech.
             </p>
 
-            <!-- Video Player (Replace source with your actual video link) -->
+            <!-- Video Player -->
             <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-700 video-player-container mb-6">
-                <video controls class="w-full h-full object-cover">
-                    <!-- ACTION: Replace the src with your video file path (e.g., demos/visuweave_demo.mp4) -->
-                    <source src="https://github.com/UDAY2031/Project_demo/blob/main/VisuWeave%20demo.mp4" type="video/mp4">
+                <video controls preload="auto" class="w-full h-full object-cover">
+                    <!-- VisuWeave URL (Working): -->
+                    <source src="https://raw.githubusercontent.com/UDAY2031/Project_demo/main/VisuWeave%20demo.mp4" type="video/mp4">
                     <p class="text-center pt-8 text-gray-500">
                         Video Placeholder (VisuWeave Demo) <br>
-                        <strong>Please update the video source attribute.</strong>
+                        <strong>Video failed to load. Please verify the URL.</strong>
                     </p>
                 </video>
             </div>
 
-            <!-- Actions -->
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="https://github.com/UDAY2031/VisuWeave.git" target="_blank" class="flex-1 text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
+            <!-- Actions - Only one full-width GitHub button -->
+            <div class="mt-4">
+                <a href="https://github.com/UDAY2031/Project_demo" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
                     View VisuWeave Code on GitHub
                 </a>
-                <button class="copy-link-btn flex-1 py-3 px-4 bg-accent-indigo hover:bg-indigo-700 text-white font-semibold rounded-lg transition duration-200" data-link="VISUWEAVE_DEMO_URL">
-                    Get Direct Link
-                </button>
             </div>
         </section>
 
@@ -163,32 +160,29 @@
                 EcoVista - AI-Driven Waste Segregation
             </h2>
             <p class="text-gray-400 mb-6 font-semibold">
-                Tech Stack: Python, OpenCV, YOLOv8, IoT-enabled Hardware
+                Tech Stack: Python, OpenCV, YOLOv8, IoT-enabled Hardware, CVAT
             </p>
             <p class="text-gray-400 mb-6">
-                Engineered an **energy-efficient hardware prototype** using **YOLOv8** that achieved **92% accuracy** in waste segregation across 4 categories. The system implemented CVAT-based litter detection and included an app-based reward system, which reduced improper disposal by **35%** during pilot tests.
+                A comprehensive waste management solution with four modules: **YOLO v8-based Segregation** (dry, wet, recyclable, hazardous), **CVAT-enhanced Litter Detection**, a cost-effective **Hardware Prototype** using OpenCV for classification and sorting, and a **User/Admin Application**. The system includes an app-based reward system and surveillance monitoring with image matching to encourage proper disposal and maintain clean surroundings.
             </p>
 
-            <!-- Video Player (Replace source with your actual video link) -->
+            <!-- Video Player -->
             <div class="aspect-video bg-gray-900 rounded-lg overflow-hidden border border-gray-700 video-player-container mb-6">
-                <video controls class="w-full h-full object-cover">
-                    <!-- ACTION: Replace the src with your video file path (e.g., demos/ecovista_demo.mp4) -->
-                    <source src="https://github.com/UDAY2031/Project_demo/blob/main/EcoVista%20demo%202.mp4" type="video/mp4">
+                <video controls preload="auto" class="w-full h-full object-cover" crossorigin="anonymous">
+                    <!-- FIXED: Added crossorigin attribute and verified the raw content URL structure. -->
+                    <source src="https://raw.githubusercontent.com/UDAY2031/Project_demo/main/EcoVista%20demo%202.mp4" type="video/mp4">
                     <p class="text-center pt-8 text-gray-500">
                         Video Placeholder (EcoVista Demo) <br>
-                        <strong>Please update the video source attribute.</strong>
+                        <strong>Video failed to load. Please verify the URL.</strong>
                     </p>
                 </video>
             </div>
 
-            <!-- Actions -->
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="https://github.com/UDAY2031/EcoVista.git" target="_blank" class="flex-1 text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
+            <!-- Actions - Only one full-width GitHub button -->
+            <div class="mt-4">
+                <a href="https://github.com/UDAY2031/EcoVista" target="_blank" class="w-full block text-center py-3 px-4 bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold rounded-lg transition duration-200">
                     View EcoVista Code on GitHub
                 </a>
-                <button class="copy-link-btn flex-1 py-3 px-4 bg-accent-indigo hover:bg-indigo-700 text-white font-semibold rounded-lg transition duration-200" data-link="ECOVISTA_DEMO_URL">
-                    Get Direct Link
-                </button>
             </div>
         </section>
 
@@ -197,7 +191,7 @@
     <!-- Footer -->
     <footer class="mt-12 text-center text-gray-500 border-t border-gray-900 pt-6 relative z-20">
         <p>Prepared for Your Interview | &copy; 2025</p>
-        <p class="text-sm mt-1">Contact: uday242004@gmail.com</p>
+        <p class="text-sm mt-1">Contact: your.email@example.com</p>
     </footer>
 
 </body>
